@@ -1,18 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pwd Manager</title>
-  <link rel="stylesheet" href="./assets/css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pwd Manager</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
-  <h1>Password Manager</h1>
-  <div id="app">
-    <!-- UI Elements for managing passwords go here -->
-    <button id="generate">Generate Password</button>
-    <div id="password"></div>
-  </div>
-  <script src="renderer.js"></script>
+    <h1>Password Manager</h1>
+    
+    <!-- Password Generator Section -->
+    <section id="generator">
+        <h2>Generate Password</h2>
+        <button id="generate">Generate</button>
+        <div id="password" class="password-display"></div>
+    </section>
+    
+    <!-- Password Saving Section -->
+    <section id="save">
+        <h2>Save Password</h2>
+        <input type="text" id="title" placeholder="Title">
+        <input type="text" id="username" placeholder="Username">
+        <button id="save">Save Password</button>
+    </section>
+    
+    <!-- Password List Section -->
+    <section id="list">
+        <h2>Saved Passwords</h2>
+        <button id="load">Load Passwords</button>
+        <div id="password-list" class="password-list"></div>
+    </section>
+    
+    <script src="renderer.js"></script>
 </body>
 </html>
