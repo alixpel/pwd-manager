@@ -1,3 +1,6 @@
+PWD Manager
+
+``` text
 pwd-manager/
 ├── main.js
 ├── package.json
@@ -6,3 +9,4 @@ pwd-manager/
 └── assets/
     └── css/
         └── styles.css
+```
