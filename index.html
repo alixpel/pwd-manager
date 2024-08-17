@@ -8,29 +8,41 @@
 </head>
 <body>
     <h1>Password Manager</h1>
-    
+
+    <!-- Master Password Section -->
+    <section id="auth">
+        <h2>Set Master Password</h2>
+        <input type="password" id="master-password" placeholder="Enter new master password">
+        <button id="set-master-password">Set Master Password</button>
+
+        <h2>Login</h2>
+        <input type="password" id="login-password" placeholder="Enter master password">
+        <button id="login">Login</button>
+        <div id="login-status"></div>
+    </section>
+
     <!-- Password Generator Section -->
-    <section id="generator">
+    <section id="generator" style="display: none;">
         <h2>Generate Password</h2>
         <button id="generate">Generate</button>
         <div id="password" class="password-display"></div>
     </section>
-    
+
     <!-- Password Saving Section -->
-    <section id="save">
+    <section id="save" style="display: none;">
         <h2>Save Password</h2>
         <input type="text" id="title" placeholder="Title">
         <input type="text" id="username" placeholder="Username">
         <button id="save">Save Password</button>
     </section>
-    
+
     <!-- Password List Section -->
-    <section id="list">
+    <section id="list" style="display: none;">
         <h2>Saved Passwords</h2>
         <button id="load">Load Passwords</button>
         <div id="password-list" class="password-list"></div>
     </section>
-    
+
     <script src="renderer.js"></script>
 </body>
 </html>
