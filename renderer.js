@@ -1,35 +1,30 @@
+// Access the Electron API exposed via preload.js
+//const electronAPI = window.electronAPI;
+//const crypto = require('crypto');
+
+
 // Password generator:
-const crypto = require('crypto');
 
-// Function to generate a random password
-function generatePassword(length) {
-  return crypto.randomBytes(length).toString('base64').slice(0, length);
-}
-
-// Handle password generation on button click
 document.getElementById('generate').addEventListener('click', () => {
-  const password = generatePassword(16);
+  const password = window.electronAPI.generatePassword(16);
   document.getElementById('password').textContent = password;
 });
 
-// Password storage and retrieval using IPC
-const { ipcRenderer } = require('electron');
-
-// Handle saving a password
+// Event listener for saving a password
 document.getElementById('save').addEventListener('click', () => {
   const title = document.getElementById('title').value;
   const username = document.getElementById('username').value;
   const password = document.getElementById('password').textContent;
-  ipcRenderer.send('save-password', { title, username, password });
+  window.electronAPI.savePassword({ title, username, password });
 });
 
-// Handle retrieving passwords
+// Event listener for loading passwords
 document.getElementById('load').addEventListener('click', () => {
-  ipcRenderer.send('load-passwords');
+  window.electronAPI.loadPasswords();
 });
 
-// Update the UI with loaded passwords
-ipcRenderer.on('passwords', (event, passwords) => {
+// Display passwords
+window.electronAPI.onPasswordsLoaded((event, passwords) => {
   const passwordList = document.getElementById('password-list');
   passwordList.innerHTML = '';
   passwords.forEach(password => {
@@ -39,29 +34,26 @@ ipcRenderer.on('passwords', (event, passwords) => {
   });
 });
 
-// Master password functionality :
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
+// Master password management
+document.getElementById('set-master-password').addEventListener('click', () => {
+  const masterPassword = document.getElementById('master-password').value;
+  window.electronAPI.setMasterPassword(masterPassword);
+});
 
-let masterPasswordHash = '';
+document.getElementById('login').addEventListener('click', () => {
+  const masterPassword = document.getElementById('login-password').value;
+  window.electronAPI.verifyMasterPassword(masterPassword);
+});
 
-function setMasterPassword(masterPassword) {
-  bcrypt.hash(masterPassword, saltRounds, (err, hash) => {
-    if (err) {
-      console.error('Error hashing master password:', err);
-    } else {
-      masterPasswordHash = hash;
-      console.log('Master password set successfully.');
-    }
-  });
-}
-
-function verifyMasterPassword(masterPassword, callback) {
-  bcrypt.compare(masterPassword, masterPasswordHash, (err, result) => {
-    if (err) {
-      console.error('Error verifying master password:', err);
-    } else {
-      callback(result);
-    }
-  });
-}
+window.electronAPI.onAuthStatus((event, status) => {
+  if (status === 'authenticated') {
+    document.getElementById('generator').style.display = 'block';
+    document.getElementById('save').style.display = 'block';
+    document.getElementById('list').style.display = 'block';
+    document.getElementById('auth').style.display = 'none';
+  } else if (status === 'password-set') {
+    document.getElementById('login-status').textContent = 'Master password set successfully. Please log in.';
+  } else {
+    document.getElementById('login-status').textContent = 'Invalid master password. Please try again.';
+  }
+});
