@@ -75,9 +75,10 @@ ipcMain.on('verify-master-password', (event, masterPassword) => {
   });
 });
 
-// Handle saving a password
+// Handle saving a database password (not master)
 ipcMain.on('save-password', (event, { title, username, password }) => {
   const encryptedPassword = encryptPassword(password);
+  console.log('encrypted password : ', encryptedPassword);
   const stmt = db.prepare('INSERT INTO passwords (title, username, password) VALUES (?, ?, ?)');
   stmt.run(title, username, encryptedPassword, (err) => {
     if (err) {
@@ -110,6 +111,7 @@ ipcMain.handle('load-passwords', async (event) => {
 });
 */
 // testing :
+/*
 ipcMain.handle('load-passwords', async (event) => {
   return new Promise((resolve, reject) => {
     db.all('SELECT * FROM passwords', [], (err, rows) => {
@@ -123,9 +125,35 @@ ipcMain.handle('load-passwords', async (event) => {
     });
   });
 });
+*/
+// more testing :
+ipcMain.handle('load-passwords', async (event) => {
+  return new Promise((resolve, reject) => {
+    db.all('SELECT * FROM passwords', [], (err, rows) => {
+      if (err) {
+        console.error('Error fetching passwords:', err);
+        reject(err);
+      } else {
+        const decryptedRows = rows.map(row => {
+          const decryptedPassword = decryptPassword(row.password);
+          console.log('Decrypted Password:', decryptedPassword); // Debug log
+          return {
+            ...row,
+            password: decryptedPassword
+          };
+        });
+        resolve(decryptedRows);
+      }
+    });
+  });
+});
 // end of testing
 
 // Encryption and decryption functions
+const algorithm = 'aes-256-cbc';
+const iv = crypto.randomBytes(16); // Generate a new IV for each encryption
+
+/*
 const algorithm = 'aes-256-cbc';
 const iv = crypto.randomBytes(16);
 
@@ -135,7 +163,22 @@ function encryptPassword(password) {
   encrypted = Buffer.concat([encrypted, cipher.final()]);
   return JSON.stringify({ iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') });
 }
+  */
+ // new encryption with try catch :
+ function encryptPassword(password) {
+  try {
+    // const iv = crypto.randomBytes(16); // Generate a new IV for each encryption
+    const cipher = crypto.createCipheriv(algorithm, key, iv);
+    let encrypted = cipher.update(password);
+    encrypted = Buffer.concat([encrypted, cipher.final()]);
+    return JSON.stringify({ iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') });
+  } catch (error) {
+    console.error('Error encrypting password:', error);
+    return null; // Return null or an appropriate value in case of encryption error
+  }
+}
 
+/*
 function decryptPassword(encrypted) {
   let { iv, encryptedData } = JSON.parse(encrypted);
   iv = Buffer.from(iv, 'hex');
@@ -145,6 +188,23 @@ function decryptPassword(encrypted) {
   decrypted = Buffer.concat([decrypted, decipher.final()]);
   return decrypted.toString();
 }
+*/
+// new decryption test with try catch :
+function decryptPassword(encrypted) {
+  try {
+    const { iv, encryptedData } = JSON.parse(encrypted);
+    const ivBuffer = Buffer.from(iv, 'hex');
+    const encryptedBuffer = Buffer.from(encryptedData, 'hex');
+    const decipher = crypto.createDecipheriv(algorithm, key, ivBuffer);
+    let decrypted = decipher.update(encryptedBuffer);
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    return decrypted.toString();
+  } catch (error) {
+    console.error('Error decrypting password:', error);
+    return null; // Return null or an appropriate value in case of decryption error
+  }
+}
+
 
 app.whenReady().then(() => {
   createWindow();
