@@ -33,3 +33,10 @@ body {
     cursor: pointer;
   }
   
+  .password-item {
+    margin-bottom: 10px;
+}
+
+.password-item button {
+    margin-left: 10px;
+}

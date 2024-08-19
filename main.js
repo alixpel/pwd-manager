@@ -92,41 +92,6 @@ ipcMain.on('save-password', (event, { title, username, password }) => {
 
 
 // Handle loading passwords (Promise-based)
-/*
-ipcMain.handle('load-passwords', async (event) => {
-  return new Promise((resolve, reject) => {
-    db.all('SELECT * FROM passwords', [], (err, rows) => {
-      if (err) {
-        console.error('Error fetching passwords:', err);
-        reject(err);
-      } else {
-        const decryptedRows = rows.map(row => ({
-          ...row,
-          password: decryptPassword(row.password)
-        }));
-        resolve(decryptedRows);
-      }
-    });
-  });
-});
-*/
-// testing :
-/*
-ipcMain.handle('load-passwords', async (event) => {
-  return new Promise((resolve, reject) => {
-    db.all('SELECT * FROM passwords', [], (err, rows) => {
-      if (err) {
-        console.error('Error fetching passwords:', err);
-        reject(err);
-      } else {
-        // Directly resolve rows without decryption
-        resolve(rows);
-      }
-    });
-  });
-});
-*/
-// more testing :
 ipcMain.handle('load-passwords', async (event) => {
   return new Promise((resolve, reject) => {
     db.all('SELECT * FROM passwords', [], (err, rows) => {
@@ -136,7 +101,7 @@ ipcMain.handle('load-passwords', async (event) => {
       } else {
         const decryptedRows = rows.map(row => {
           const decryptedPassword = decryptPassword(row.password);
-          console.log('Decrypted Password:', decryptedPassword); // Debug log
+          //console.log('Decrypted Password:', decryptedPassword);
           return {
             ...row,
             password: decryptedPassword
@@ -147,24 +112,29 @@ ipcMain.handle('load-passwords', async (event) => {
     });
   });
 });
-// end of testing
 
-// Encryption and decryption functions
+// password edition :
+ipcMain.handle('update-password', async (event, { id, title, username, password }) => {
+  return new Promise((resolve, reject) => {
+      const encryptedPassword = encryptPassword(password);
+      const stmt = db.prepare('UPDATE passwords SET title = ?, username = ?, password = ? WHERE id = ?');
+      stmt.run(title, username, encryptedPassword, id, (err) => {
+          if (err) {
+              reject(err);
+          } else {
+              resolve();
+          }
+      });
+      stmt.finalize();
+  });
+});
+
+// Encryption and decryption functions :
+
 const algorithm = 'aes-256-cbc';
 const iv = crypto.randomBytes(16); // Generate a new IV for each encryption
 
-/*
-const algorithm = 'aes-256-cbc';
-const iv = crypto.randomBytes(16);
-
-function encryptPassword(password) {
-  let cipher = crypto.createCipheriv(algorithm, key, iv);
-  let encrypted = cipher.update(password);
-  encrypted = Buffer.concat([encrypted, cipher.final()]);
-  return JSON.stringify({ iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') });
-}
-  */
- // new encryption with try catch :
+ // Encryption with try catch :
  function encryptPassword(password) {
   try {
     // const iv = crypto.randomBytes(16); // Generate a new IV for each encryption
@@ -178,18 +148,7 @@ function encryptPassword(password) {
   }
 }
 
-/*
-function decryptPassword(encrypted) {
-  let { iv, encryptedData } = JSON.parse(encrypted);
-  iv = Buffer.from(iv, 'hex');
-  encryptedData = Buffer.from(encryptedData, 'hex');
-  let decipher = crypto.createDecipheriv(algorithm, key, iv);
-  let decrypted = decipher.update(encryptedData);
-  decrypted = Buffer.concat([decrypted, decipher.final()]);
-  return decrypted.toString();
-}
-*/
-// new decryption test with try catch :
+// Decryption with try catch :
 function decryptPassword(encrypted) {
   try {
     const { iv, encryptedData } = JSON.parse(encrypted);
@@ -204,6 +163,8 @@ function decryptPassword(encrypted) {
     return null; // Return null or an appropriate value in case of decryption error
   }
 }
+
+
 
 
 app.whenReady().then(() => {

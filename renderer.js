@@ -18,20 +18,72 @@ document.getElementById('save').addEventListener('click', () => {
   window.electronAPI.savePassword({ title, username, password });
 });
 
-// Event listener for loading passwords
+// Load and display passwords
 document.getElementById('load').addEventListener('click', () => {
-  window.electronAPI.loadPasswords().then((passwords) => {
-    const passwordList = document.getElementById('password-list');
-    passwordList.innerHTML = '';  // Clear previous passwords
-    passwords.forEach(password => {
-      const item = document.createElement('div');
-      item.textContent = `${password.title}: ${password.username} - ${password.password}`;
-      passwordList.appendChild(item);
-    });
-  }).catch(err => {
-    console.error('Failed to load passwords:', err);
-  });
+  window.electronAPI.loadPasswords()
+      .then((passwords) => {
+          const passwordList = document.getElementById('password-list');
+          passwordList.innerHTML = ''; // Clear previous content
+          passwords.forEach(password => {
+              const item = document.createElement('div');
+              item.classList.add('password-item');
+              
+              // Password details
+              const details = document.createElement('span');
+              details.textContent = `${password.title}: ${password.username} - ${password.password}`;
+              item.appendChild(details);
+
+              // Edit button
+              const editButton = document.createElement('button');
+              editButton.textContent = 'Edit';
+              editButton.addEventListener('click', () => editPassword(password));
+              item.appendChild(editButton);
+
+              passwordList.appendChild(item);
+          });
+          document.getElementById('edit').style.display = 'none';
+          document.getElementById('list').style.display = 'block';
+      })
+      .catch(err => {
+          console.error('Failed to load passwords:', err);
+      });
 });
+
+// Edit password function
+function editPassword(password) {
+  document.getElementById('edit-id').value = password.id;
+  document.getElementById('edit-title').value = password.title;
+  document.getElementById('edit-username').value = password.username;
+  document.getElementById('edit-password').value = password.password;
+  document.getElementById('list').style.display = 'none';
+  document.getElementById('edit').style.display = 'block';
+}
+
+// Update password
+document.getElementById('update-password').addEventListener('click', () => {
+  const id = document.getElementById('edit-id').value;
+  const title = document.getElementById('edit-title').value;
+  const username = document.getElementById('edit-username').value;
+  const password = document.getElementById('edit-password').value;
+
+  window.electronAPI.updatePassword({ id, title, username, password })
+      .then(() => {
+          alert('Password updated successfully');
+          document.getElementById('edit').style.display = 'none';
+          document.getElementById('list').style.display = 'block';
+          document.getElementById('load').click(); // Reload the password list
+      })
+      .catch(err => {
+          console.error('Failed to update password:', err);
+      });
+});
+
+// Cancel editing
+document.getElementById('cancel-edit').addEventListener('click', () => {
+  document.getElementById('edit').style.display = 'none';
+  document.getElementById('list').style.display = 'block';
+});
+
 
 // Master password management
 document.getElementById('set-master-password').addEventListener('click', () => {

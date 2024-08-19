@@ -42,7 +42,25 @@
     <section id="list" style="display: none;">
         <h2>Saved Passwords</h2>
         <button id="load">Load Passwords</button>
-        <div id="password-list" class="password-list"></div>
+        <div id="password-list" class="password-list">
+            
+        </div>
+    </section>
+
+    <!-- Password Editing Section -->
+    <section id="edit" style="display: none;">
+        <h2>Edit Password</h2> 
+        <form id="edit-form">
+            <input type="hidden" id="edit-id">
+            <label for="edit-title">Title:</label>
+            <input type="text" id="edit-title"><br>
+            <label for="edit-username">Username:</label>
+            <input type="text" id="edit-username"><br>
+            <label for="edit-password">Password:</label>
+            <input type="text" id="edit-password"><br>
+            <button type="button" id="update-password">Update Password</button>
+            <button type="button" id="cancel-edit">Cancel</button>
+        </form>
     </section>
 
     <script src="renderer.js"></script>
