@@ -89,20 +89,41 @@ ipcMain.on('save-password', (event, { title, username, password }) => {
   stmt.finalize();
 });
 
-// Handle loading passwords
-ipcMain.on('load-passwords', (event) => {
-  db.all('SELECT * FROM passwords', [], (err, rows) => {
-    if (err) {
-      console.error('Error fetching passwords:', err);
-    } else {
-      const decryptedRows = rows.map(row => ({
-        ...row,
-        password: decryptPassword(row.password)
-      }));
-      event.sender.send('passwords', decryptedRows);
-    }
+
+// Handle loading passwords (Promise-based)
+/*
+ipcMain.handle('load-passwords', async (event) => {
+  return new Promise((resolve, reject) => {
+    db.all('SELECT * FROM passwords', [], (err, rows) => {
+      if (err) {
+        console.error('Error fetching passwords:', err);
+        reject(err);
+      } else {
+        const decryptedRows = rows.map(row => ({
+          ...row,
+          password: decryptPassword(row.password)
+        }));
+        resolve(decryptedRows);
+      }
+    });
   });
 });
+*/
+// testing :
+ipcMain.handle('load-passwords', async (event) => {
+  return new Promise((resolve, reject) => {
+    db.all('SELECT * FROM passwords', [], (err, rows) => {
+      if (err) {
+        console.error('Error fetching passwords:', err);
+        reject(err);
+      } else {
+        // Directly resolve rows without decryption
+        resolve(rows);
+      }
+    });
+  });
+});
+// end of testing
 
 // Encryption and decryption functions
 const algorithm = 'aes-256-cbc';

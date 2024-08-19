@@ -20,17 +20,16 @@ document.getElementById('save').addEventListener('click', () => {
 
 // Event listener for loading passwords
 document.getElementById('load').addEventListener('click', () => {
-  window.electronAPI.loadPasswords();
-});
-
-// Display passwords
-window.electronAPI.onPasswordsLoaded((event, passwords) => {
-  const passwordList = document.getElementById('password-list');
-  passwordList.innerHTML = '';
-  passwords.forEach(password => {
-    const item = document.createElement('div');
-    item.textContent = `${password.title}: ${password.username} - ${password.password}`;
-    passwordList.appendChild(item);
+  window.electronAPI.loadPasswords().then((passwords) => {
+    const passwordList = document.getElementById('password-list');
+    passwordList.innerHTML = '';  // Clear previous passwords
+    passwords.forEach(password => {
+      const item = document.createElement('div');
+      item.textContent = `${password.title}: ${password.username} - ${password.password}`;
+      passwordList.appendChild(item);
+    });
+  }).catch(err => {
+    console.error('Failed to load passwords:', err);
   });
 });
 
