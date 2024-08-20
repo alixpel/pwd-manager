@@ -15,8 +15,14 @@ document.getElementById('save').addEventListener('click', () => {
   const title = document.getElementById('title').value;
   const username = document.getElementById('username').value;
   const password = document.getElementById('password').textContent;
-  window.electronAPI.savePassword({ title, username, password });
+  // Check if any field is missing
+  if (title && username && password) {
+    window.electronAPI.savePassword({ title, username, password });
+  } else {
+    console.error(`Cannot save. Missing title ${title}, username ${username}, or password ${password}.`);
+  }
 });
+
 
 // Load and display passwords
 document.getElementById('load').addEventListener('click', () => {
@@ -105,7 +111,7 @@ document.getElementById('login').addEventListener('click', () => {
 window.electronAPI.onAuthStatus((event, status) => {
   if (status === 'authenticated') {
     document.getElementById('generator').style.display = 'block';
-    document.getElementById('save').style.display = 'block';
+    document.getElementById('saving').style.display = 'block';
     document.getElementById('list').style.display = 'block';
     document.getElementById('auth').style.display = 'none';
   } else if (status === 'password-set') {

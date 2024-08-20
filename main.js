@@ -36,8 +36,8 @@ if (fs.existsSync(keyFilePath)) {
 // Create main window
 function createWindow() {
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1000,
+    height: 800,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
@@ -77,19 +77,23 @@ ipcMain.on('verify-master-password', (event, masterPassword) => {
 
 // Handle saving a database password (not master)
 ipcMain.on('save-password', (event, { title, username, password }) => {
-  const encryptedPassword = encryptPassword(password);
-  console.log('encrypted password : ', encryptedPassword);
-  const stmt = db.prepare('INSERT INTO passwords (title, username, password) VALUES (?, ?, ?)');
-  stmt.run(title, username, encryptedPassword, (err) => {
-    if (err) {
-      console.error('Error saving password:', err);
-    } else {
-      console.log('Password saved successfully.');
-      console.log(`title : ${title} ; username : ${username} ; pwd : ${password} .`)
-    }
-  });
-  stmt.finalize();
+  // Ensure that all fields are provided before saving
+  if (title && username && password) {
+    const encryptedPassword = encryptPassword(password);
+    const stmt = db.prepare('INSERT INTO passwords (title, username, password) VALUES (?, ?, ?)');
+    stmt.run(title, username, encryptedPassword, (err) => {
+      if (err) {
+        console.error('Error saving password:', err);
+      } else {
+        console.log('Password saved successfully.');
+      }
+    });
+    stmt.finalize();
+  } else {
+    console.error(`Missing title ${title}, username ${username}, or password ${password}. Not saving.`);
+  }
 });
+
 
 
 // Handle loading passwords (Promise-based)
