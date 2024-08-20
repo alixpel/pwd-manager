@@ -85,6 +85,7 @@ ipcMain.on('save-password', (event, { title, username, password }) => {
       console.error('Error saving password:', err);
     } else {
       console.log('Password saved successfully.');
+      console.log(`title : ${title} ; username : ${username} ; pwd : ${password} .`)
     }
   });
   stmt.finalize();
@@ -101,7 +102,7 @@ ipcMain.handle('load-passwords', async (event) => {
       } else {
         const decryptedRows = rows.map(row => {
           const decryptedPassword = decryptPassword(row.password);
-          //console.log('Decrypted Password:', decryptedPassword);
+          console.log(`Id : ${row.id} Decrypted Password: ${decryptedPassword}.`);
           return {
             ...row,
             password: decryptedPassword

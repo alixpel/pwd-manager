@@ -21,33 +21,39 @@ document.getElementById('save').addEventListener('click', () => {
 // Load and display passwords
 document.getElementById('load').addEventListener('click', () => {
   window.electronAPI.loadPasswords()
-      .then((passwords) => {
-          const passwordList = document.getElementById('password-list');
-          passwordList.innerHTML = ''; // Clear previous content
-          passwords.forEach(password => {
-              const item = document.createElement('div');
-              item.classList.add('password-item');
-              
-              // Password details
-              const details = document.createElement('span');
-              details.textContent = `${password.title}: ${password.username} - ${password.password}`;
-              item.appendChild(details);
+    .then((passwords) => {
+      const passwordList = document.getElementById('password-list');
+      passwordList.innerHTML = ''; // Clear previous content
 
-              // Edit button
-              const editButton = document.createElement('button');
-              editButton.textContent = 'Edit';
-              editButton.addEventListener('click', () => editPassword(password));
-              item.appendChild(editButton);
-
-              passwordList.appendChild(item);
-          });
-          document.getElementById('edit').style.display = 'none';
-          document.getElementById('list').style.display = 'block';
-      })
-      .catch(err => {
-          console.error('Failed to load passwords:', err);
+      passwords.forEach(password => {
+        // Only create the div if the password object is fully populated
+        if (password.title && password.username && password.password) {
+          const item = document.createElement('div');
+          item.classList.add('password-item');
+          // Password details
+          const details = document.createElement('span');
+          details.textContent = `${password.title}: ${password.username} - ${password.password}`;
+          item.appendChild(details);
+          // Edit button
+          const editButton = document.createElement('button');
+          editButton.textContent = 'Edit';
+          editButton.addEventListener('click', () => editPassword(password));
+          item.appendChild(editButton);
+          passwordList.appendChild(item);
+          console.log("no missing elements");
+        } else {
+          console.log("missing elements");
+        }
       });
+
+      document.getElementById('edit').style.display = 'none';
+      document.getElementById('list').style.display = 'block';
+    })
+    .catch(err => {
+      console.error('Failed to load passwords:', err);
+    });
 });
+
 
 // Edit password function
 function editPassword(password) {
