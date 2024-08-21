@@ -18,10 +18,6 @@ db.serialize(() => {
   )`);
 });
 
-// Master password hash
-let masterPasswordHash = '';
-const saltRounds = 10;
-
 // Load encryption key or generate it if it doesn't exist
 const keyFilePath = path.join(__dirname, 'encryption.key');
 let key;
@@ -49,6 +45,24 @@ function createWindow() {
   mainWindow.webContents.openDevTools();
 }
 
+/////////////////////
+// MASTER PASSWORD //
+/////////////////////
+
+// File to store the master password hash
+const passwordFilePath = path.join(__dirname, 'master-password-hash.txt');
+
+// Master password hash
+let masterPasswordHash = '';
+const saltRounds = 10;
+
+if (fs.existsSync(passwordFilePath)) {
+  masterPasswordHash = fs.readFileSync(passwordFilePath, 'utf8');
+  console.log('Master password hash loaded from file.');
+} else {
+  console.log('No master password hash found. A new one needs to be set.');
+}
+
 // Handle setting the master password
 ipcMain.on('set-master-password', (event, masterPassword) => {
   bcrypt.hash(masterPassword, saltRounds, (err, hash) => {
@@ -56,6 +70,14 @@ ipcMain.on('set-master-password', (event, masterPassword) => {
       console.error('Error hashing master password:', err);
     } else {
       masterPasswordHash = hash;
+      // Save the hash to the file
+      fs.writeFile(passwordFilePath, masterPasswordHash, (err) => {
+        if (err) {
+          console.error('Error saving master password hash:', err);
+        } else {
+          console.log('Master password hash saved to file.');
+        }
+      });
       event.sender.send('auth-status', 'password-set');
     }
   });
@@ -63,6 +85,12 @@ ipcMain.on('set-master-password', (event, masterPassword) => {
 
 // Handle verifying the master password
 ipcMain.on('verify-master-password', (event, masterPassword) => {
+  if (!masterPasswordHash) {
+    console.error('No master password has been set.');
+    event.sender.send('auth-status', 'invalid');
+    return;
+  }
+
   bcrypt.compare(masterPassword, masterPasswordHash, (err, result) => {
     if (err) {
       console.error('Error verifying master password:', err);
@@ -74,6 +102,10 @@ ipcMain.on('verify-master-password', (event, masterPassword) => {
     }
   });
 });
+
+////////////////////////////
+// PASSWORDS - not master //
+////////////////////////////
 
 // Handle saving a database password (not master)
 ipcMain.on('save-password', (event, { title, username, password }) => {

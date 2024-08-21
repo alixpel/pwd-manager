@@ -1,5 +1,12 @@
 node_modules/
 /node_modules
 node_modules
+*node_modules/
 passwords.db
 /passwords.db
+master-password-hash.txt
+*master-password-hash.txt
+/master-password-hash.txt
+*passwords.db
+*encryption.key
+encryption.key

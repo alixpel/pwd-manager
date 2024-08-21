@@ -2,9 +2,11 @@
 //const electronAPI = window.electronAPI;
 //const crypto = require('crypto');
 
+////////////////////////////
+// PASSWORDS - not master //
+////////////////////////////
 
 // Password generator:
-
 document.getElementById('generate').addEventListener('click', () => {
   const password = window.electronAPI.generatePassword(16);
   document.getElementById('password').textContent = password;
@@ -96,25 +98,32 @@ document.getElementById('cancel-edit').addEventListener('click', () => {
   document.getElementById('list').style.display = 'block';
 });
 
+/////////////////////
+// MASTER PASSWORD //
+/////////////////////
 
 // Master password management
 document.getElementById('set-master-password').addEventListener('click', () => {
   const masterPassword = document.getElementById('master-password').value;
   window.electronAPI.setMasterPassword(masterPassword);
+  console.log("master password was set : ", masterPassword);
 });
 
 document.getElementById('login').addEventListener('click', () => {
   const masterPassword = document.getElementById('login-password').value;
   window.electronAPI.verifyMasterPassword(masterPassword);
+  console.log("login password was verified");
 });
 
 window.electronAPI.onAuthStatus((event, status) => {
   if (status === 'authenticated') {
+    console.log("status : authenticated");
     document.getElementById('generator').style.display = 'block';
     document.getElementById('saving').style.display = 'block';
     document.getElementById('list').style.display = 'block';
     document.getElementById('auth').style.display = 'none';
   } else if (status === 'password-set') {
+    console.log("not authenticated");
     document.getElementById('login-status').textContent = 'Master password set successfully. Please log in.';
   } else {
     document.getElementById('login-status').textContent = 'Invalid master password. Please try again.';
