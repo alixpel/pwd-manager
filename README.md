@@ -2,10 +2,15 @@ PWD Manager
 
 ``` text
 pwd-manager/
-├── main.js
+├── .gitignore
+├── node_modules/
 ├── package.json
-├── index.html
+├── package-lock.json
+├── dbcleaner.js // for dev use
+├── main.js
+├── preload.js
 ├── renderer.js
+├── index.html
 └── assets/
     └── css/
         └── styles.css
