@@ -166,6 +166,22 @@ ipcMain.handle('update-password', async (event, { id, title, username, password 
   });
 });
 
+// Password deletion :
+ipcMain.handle('delete-password', async (event, id) => {
+  return new Promise((resolve, reject) => {
+    const stmt = db.prepare('DELETE FROM passwords WHERE id = ?');
+    stmt.run(id, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+    stmt.finalize();
+  });
+});
+
+
 // Encryption and decryption functions :
 
 const algorithm = 'aes-256-cbc';

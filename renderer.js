@@ -47,6 +47,11 @@ document.getElementById('load').addEventListener('click', () => {
           editButton.textContent = 'Edit';
           editButton.addEventListener('click', () => editPassword(password));
           item.appendChild(editButton);
+          // Delete button
+          const deleteButton = document.createElement('button');
+          deleteButton.textContent = 'Delete password';
+          deleteButton.addEventListener('click', () => deletePassword(password.id));
+          item.appendChild(deleteButton);
           passwordList.appendChild(item);
           console.log("no missing elements");
         } else {
@@ -97,6 +102,20 @@ document.getElementById('cancel-edit').addEventListener('click', () => {
   document.getElementById('edit').style.display = 'none';
   document.getElementById('list').style.display = 'block';
 });
+
+// Function to delete a password
+function deletePassword(id) {
+  if (confirm('Are you sure you want to delete this password?')) {
+    window.electronAPI.deletePassword(id)
+      .then(() => {
+        // Reload passwords after deletion
+        document.getElementById('load').click();
+      })
+      .catch(err => {
+        console.error('Failed to delete password:', err);
+      });
+  }
+}
 
 /////////////////////
 // MASTER PASSWORD //

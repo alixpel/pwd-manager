@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   savePassword: (data) => ipcRenderer.send('save-password', data),
   loadPasswords: () => ipcRenderer.invoke('load-passwords'),
   updatePassword: (passwordData) => ipcRenderer.invoke('update-password', passwordData),
+  deletePassword: (id) => ipcRenderer.invoke('delete-password', id),
   setMasterPassword: (password) => ipcRenderer.send('set-master-password', password),
   verifyMasterPassword: (password) => ipcRenderer.send('verify-master-password', password),
   onAuthStatus: (callback) => ipcRenderer.on('auth-status', callback),
