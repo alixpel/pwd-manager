@@ -42,10 +42,21 @@
     <section id="list" style="display: none;">
         <h2>Saved Passwords</h2>
         <button id="load">Load Passwords</button>
-        <div id="password-list" class="password-list">
-
-        </div>
+        <table id="password-table" class="password-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Username</th>
+              <th>Password</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="password-table-body">
+            <!-- Password rows -->
+          </tbody>
+        </table>
     </section>
+      
 
     <!-- Password Editing Section -->
     <section id="edit" style="display: none;">

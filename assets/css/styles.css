@@ -33,10 +33,32 @@ body {
     cursor: pointer;
   }
   
-  .password-item {
+.password-item {
     margin-bottom: 10px;
 }
 
 .password-item button {
     margin-left: 10px;
+}
+
+/* Password List Section (table) */
+
+.password-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.password-table th, .password-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.password-table th {
+  background-color: #f2f2f2;
+  text-align: left;
+}
+
+.password-table td button {
+  margin-right: 5px;
 }

@@ -27,7 +27,7 @@ document.getElementById('save').addEventListener('click', () => {
 
 
 // Load and display passwords
-document.getElementById('load').addEventListener('click', () => {
+/*document.getElementById('load').addEventListener('click', () => {
   window.electronAPI.loadPasswords()
     .then((passwords) => {
       const passwordList = document.getElementById('password-list');
@@ -66,6 +66,75 @@ document.getElementById('load').addEventListener('click', () => {
       console.error('Failed to load passwords:', err);
     });
 });
+*/
+// Load and display passwords
+document.getElementById('load').addEventListener('click', () => {
+  window.electronAPI.loadPasswords()
+    .then((passwords) => {
+      const passwordTableBody = document.getElementById('password-table-body');
+      passwordTableBody.innerHTML = ''; // Clear previous content
+
+      passwords.forEach(password => {
+        const row = document.createElement('tr');
+
+        // Title column
+        const titleCell = document.createElement('td');
+        titleCell.textContent = password.title;
+        row.appendChild(titleCell);
+
+        // Username column
+        const usernameCell = document.createElement('td');
+        usernameCell.textContent = password.username;
+        row.appendChild(usernameCell);
+
+        // Password column
+        const passwordCell = document.createElement('td');
+        passwordCell.textContent = password.password;
+        row.appendChild(passwordCell);
+
+        // Actions column (Edit & Delete buttons)
+        const actionsCell = document.createElement('td');
+
+        // Edit button
+        const editButton = document.createElement('button');
+        editButton.textContent = 'Edit';
+        editButton.addEventListener('click', () => editPassword(password));
+        actionsCell.appendChild(editButton);
+
+        // Delete button
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', () => deletePassword(password.id));
+        actionsCell.appendChild(deleteButton);
+
+        row.appendChild(actionsCell);
+
+        // Append the row to the table body
+        passwordTableBody.appendChild(row);
+      });
+
+      document.getElementById('edit').style.display = 'none';
+      document.getElementById('list').style.display = 'block';
+    })
+    .catch(err => {
+      console.error('Failed to load passwords:', err);
+    });
+});
+
+// Function to delete a password
+function deletePassword(id) {
+  if (confirm('Are you sure you want to delete this password?')) {
+    window.electronAPI.deletePassword(id)
+      .then(() => {
+        // Reload passwords after deletion
+        document.getElementById('load').click();
+      })
+      .catch(err => {
+        console.error('Failed to delete password:', err);
+      });
+  }
+}
+
 
 
 // Edit password function
