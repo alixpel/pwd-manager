@@ -42,7 +42,11 @@ function createWindow() {
   });
 
   mainWindow.loadFile('index.html');
-  mainWindow.webContents.openDevTools();
+  const isDev = process.env.NODE_ENV === 'development';
+  if (isDev) {
+    mainWindow.webContents.openDevTools();
+  }
+}
 }
 
 /////////////////////
